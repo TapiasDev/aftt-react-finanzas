@@ -62,20 +62,25 @@ export function FortnightIncomeCard() {
       <form className="planner-income-form" onSubmit={handleSubmit}>
         <label className="planner-field">
           <span className="planner-label">Valor</span>
-          <input
-            className="planner-input"
-            type="number"
-            min="0"
-            step="1000"
-            value={displayedAmount}
-            onChange={(event) =>
-              setDraft({
-                fortnightId: selectedFortnightId,
-                amount: event.target.value,
-              })
-            }
-            disabled={isClosed || isSavingIncome}
-          />
+          <div className="planner-money-input">
+            <span className="planner-money-prefix">$</span>
+            <input
+              className="planner-input planner-input-money"
+              type="number"
+              min="0"
+              step="1000"
+              inputMode="numeric"
+              value={displayedAmount}
+              onChange={(event) =>
+                setDraft({
+                  fortnightId: selectedFortnightId,
+                  amount: event.target.value,
+                })
+              }
+              disabled={isClosed || isSavingIncome}
+            />
+            <span className="planner-money-suffix">COP</span>
+          </div>
         </label>
 
         <button className="planner-primary-button" type="submit" disabled={isClosed || isSavingIncome}>

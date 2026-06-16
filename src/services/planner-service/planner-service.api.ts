@@ -2,6 +2,7 @@ import { apiRequest } from '../../shared/lib/http'
 import type {
   CloseMonthInput,
   CreateExpenseInput,
+  DeleteExpenseInput,
   FortnightPeriod,
   MonthDetail,
   SaveFortnightIncomeInput,
@@ -36,7 +37,16 @@ export const plannerServiceApi: PlannerService = {
   async createExpense(input: CreateExpenseInput) {
     return apiRequest<MonthDetail>('/planner/expenses', {
       method: 'POST',
-      body: input,
+      body: {
+        fortnightPeriodId: input.fortnightPeriodId,
+        name: input.name,
+        amount: input.amount,
+        estimatedPaymentDate: input.estimatedPaymentDate,
+        description: input.description,
+        recurrence: {
+          mode: input.recurrenceMode,
+        },
+      },
     })
   },
 
@@ -57,6 +67,20 @@ export const plannerServiceApi: PlannerService = {
         amount: input.amount,
         estimatedPaymentDate: input.estimatedPaymentDate,
         description: input.description,
+        applyScope: {
+          scope: input.applyScope,
+        },
+      },
+    })
+  },
+
+  async deleteExpense(input: DeleteExpenseInput) {
+    return apiRequest<MonthDetail>(`/planner/expenses/${input.expenseId}`, {
+      method: 'DELETE',
+      body: {
+        applyScope: {
+          scope: input.applyScope,
+        },
       },
     })
   },

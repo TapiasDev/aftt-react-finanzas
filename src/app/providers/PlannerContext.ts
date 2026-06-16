@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import type {
+  DeleteExpenseInput,
   Expense,
   FinancialSummary,
   FortnightPeriod,
@@ -33,6 +34,7 @@ export interface PlannerContextValue {
     amount: number
     estimatedPaymentDate: string
     description: string
+    recurrenceMode: 'none' | 'monthly_twice' | 'future_once' | 'future_twice'
   }) => Promise<void>
   toggleExpenseStatus: (expenseId: string, isPaid: boolean) => Promise<void>
   updateExpense: (input: {
@@ -41,7 +43,9 @@ export interface PlannerContextValue {
     amount: number
     estimatedPaymentDate: string
     description: string
+    applyScope: 'current' | 'future_only' | 'current_and_future'
   }) => Promise<void>
+  deleteExpense: (input: DeleteExpenseInput) => Promise<void>
   closeMonth: (monthPeriodId: string, confirmClose: boolean) => Promise<void>
 }
 

@@ -1,6 +1,7 @@
 import type {
   CloseMonthInput,
   CreateExpenseInput,
+  DeleteExpenseInput,
   FortnightPeriod,
   MonthDetail,
   SaveFortnightIncomeInput,
@@ -17,5 +18,6 @@ export interface PlannerService {
   createExpense(input: CreateExpenseInput): Promise<MonthDetail>
   toggleExpenseStatus(input: ToggleExpenseStatusInput): Promise<MonthDetail>
   updateExpense(input: UpdateExpenseInput): Promise<MonthDetail>
+  deleteExpense(input: DeleteExpenseInput): Promise<MonthDetail>
   closeMonth(input: CloseMonthInput): Promise<MonthDetail>
 }
