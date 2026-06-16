@@ -1,11 +1,21 @@
 import { useState, type FormEvent } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
+import type { ExpenseRecurrenceMode } from '../../shared/types/planner'
 
-const emptyForm = {
+interface RegisterExpenseFormState {
+  name: string
+  amount: string
+  estimatedPaymentDate: string
+  description: string
+  recurrenceMode: ExpenseRecurrenceMode
+}
+
+const emptyForm: RegisterExpenseFormState = {
   name: '',
   amount: '',
   estimatedPaymentDate: '',
   description: '',
+  recurrenceMode: 'none',
 }
 
 export function RegisterExpenseForm() {
@@ -31,13 +41,14 @@ export function RegisterExpenseForm() {
     event.preventDefault()
 
     try {
-      await createExpense({
-        fortnightPeriodId: selectedFortnightId,
-        name: form.name,
-        amount: Number(form.amount),
-        estimatedPaymentDate: form.estimatedPaymentDate,
-        description: form.description,
-      })
+        await createExpense({
+          fortnightPeriodId: selectedFortnightId,
+          name: form.name,
+          amount: Number(form.amount),
+          estimatedPaymentDate: form.estimatedPaymentDate,
+          description: form.description,
+          recurrenceMode: form.recurrenceMode,
+        })
 
       setForm(emptyForm)
       setMessage('Gasto creado como pendiente.')
@@ -72,17 +83,22 @@ export function RegisterExpenseForm() {
         <div className="planner-form-split">
           <label className="planner-field">
             <span className="planner-label">Valor</span>
-            <input
-              className="planner-input"
-              type="number"
-              min="0"
-              step="1000"
-              value={form.amount}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, amount: event.target.value }))
-              }
-              disabled={isClosed || isSavingExpense}
-            />
+            <div className="planner-money-input">
+              <span className="planner-money-prefix">$</span>
+              <input
+                className="planner-input planner-input-money"
+                type="number"
+                min="0"
+                step="1000"
+                inputMode="numeric"
+                value={form.amount}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, amount: event.target.value }))
+                }
+                disabled={isClosed || isSavingExpense}
+              />
+              <span className="planner-money-suffix">COP</span>
+            </div>
           </label>
 
           <label className="planner-field">
@@ -109,6 +125,26 @@ export function RegisterExpenseForm() {
             }
             disabled={isClosed || isSavingExpense}
           />
+        </label>
+
+        <label className="planner-field">
+          <span className="planner-label">Repetición</span>
+          <select
+            className="planner-select"
+            value={form.recurrenceMode}
+            onChange={(event) =>
+              setForm((current) => ({
+                ...current,
+                recurrenceMode: event.target.value as typeof current.recurrenceMode,
+              }))
+            }
+            disabled={isClosed || isSavingExpense}
+          >
+            <option value="none">Solo esta quincena</option>
+            <option value="monthly_twice">Ambas quincenas de este mes</option>
+            <option value="future_once">Esta quincena en los meses futuros</option>
+            <option value="future_twice">Ambas quincenas en los meses futuros</option>
+          </select>
         </label>
 
         <button className="planner-primary-button" type="submit" disabled={isClosed || isSavingExpense}>

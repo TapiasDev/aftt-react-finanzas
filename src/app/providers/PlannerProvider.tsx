@@ -9,6 +9,7 @@ import { validateIncomeAmount } from '../../shared/lib/validation'
 import type {
   CloseMonthInput,
   CreateExpenseInput,
+  DeleteExpenseInput,
   FinancialSummary,
   FortnightType,
   MonthDetail,
@@ -28,6 +29,9 @@ const emptySummary: FinancialSummary = {
 }
 
 export function PlannerProvider({ children }: PropsWithChildren) {
+  const today = new Date()
+  const currentYear = today.getFullYear()
+  const currentMonthNumber = today.getMonth() + 1
   const [availableYears, setAvailableYears] = useState<number[]>([])
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [months, setMonths] = useState<MonthSummary[]>([])
@@ -56,7 +60,7 @@ export function PlannerProvider({ children }: PropsWithChildren) {
 
         setAvailableYears(years)
 
-        const defaultYear = years.at(-1) ?? null
+        const defaultYear = years.includes(currentYear) ? currentYear : (years.at(-1) ?? null)
 
         if (defaultYear !== null) {
           await loadYear(defaultYear)
@@ -107,8 +111,14 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     const yearData = await plannerService.getYear(year)
     setSelectedYear(yearData.selectedYear)
     setMonths(yearData.months)
+    setAvailableYears((currentYears) => [...new Set([...currentYears, yearData.selectedYear])].sort((a, b) => a - b))
 
-    const nextMonthNumber = preferredMonthNumber ?? yearData.months.find((month) => month.monthNumber === 6)?.monthNumber ?? yearData.months[0]?.monthNumber
+    const defaultMonthNumber =
+      year === currentYear
+        ? yearData.months.find((month) => month.monthNumber === currentMonthNumber)?.monthNumber
+        : yearData.months[0]?.monthNumber
+
+    const nextMonthNumber = preferredMonthNumber ?? defaultMonthNumber ?? yearData.months[0]?.monthNumber
 
     if (nextMonthNumber) {
       const monthDetail = await plannerService.getMonth(year, nextMonthNumber)
@@ -255,6 +265,22 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     }
   }
 
+  async function deleteExpense(input: DeleteExpenseInput) {
+    try {
+      setIsSavingExpense(true)
+      setError(null)
+
+      const updatedMonth = await plannerService.deleteExpense(input)
+      applyUpdatedMonth(updatedMonth)
+    } catch (caughtError) {
+      const message = getErrorMessage(caughtError)
+      setError(message)
+      throw new Error(message, { cause: caughtError })
+    } finally {
+      setIsSavingExpense(false)
+    }
+  }
+
   async function closeMonth(monthPeriodId: string, confirmClose: boolean) {
     const input: CloseMonthInput = { monthPeriodId, confirmClose }
 
@@ -295,6 +321,7 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     createExpense,
     toggleExpenseStatus,
     updateExpense,
+    deleteExpense,
     closeMonth,
   } satisfies PlannerContextValue
 

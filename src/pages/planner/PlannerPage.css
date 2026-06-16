@@ -139,11 +139,44 @@
   font: inherit;
 }
 
+.planner-year-picker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
 .planner-select,
 .planner-input {
   background: rgba(15, 23, 42, 0.75);
   color: #f8fafc;
   padding: 12px 14px;
+}
+
+.planner-money-input {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.75);
+  overflow: hidden;
+}
+
+.planner-money-prefix,
+.planner-money-suffix {
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 12px;
+}
+
+.planner-input-money {
+  border: 0;
+  background: transparent;
+}
+
+.planner-input-money:focus {
+  outline: none;
 }
 
 .planner-tabs {
@@ -344,7 +377,9 @@
 }
 
 .planner-expense-actions {
-  display: grid;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-items: end;
   gap: 12px;
 }
@@ -352,6 +387,11 @@
 .planner-inline-actions {
   display: inline-flex;
   gap: 8px;
+  align-items: center;
+}
+
+.planner-inline-scope-select {
+  min-width: 160px;
 }
 
 .planner-secondary-button,
@@ -360,6 +400,51 @@
   border: 1px solid rgba(148, 163, 184, 0.2);
   padding: 12px 14px;
   font: inherit;
+}
+
+.planner-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.planner-icon-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.planner-icon-button:hover {
+  background: rgba(51, 65, 85, 0.82);
+  border-color: rgba(244, 114, 182, 0.34);
+  color: #f8fafc;
+}
+
+.planner-icon-button:focus-visible {
+  outline: none;
+  border-color: rgba(244, 114, 182, 0.5);
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.18);
+}
+
+.planner-icon-button:active {
+  transform: scale(0.98);
+}
+
+.planner-icon-button-danger:hover {
+  background: rgba(127, 29, 29, 0.38);
+  border-color: rgba(248, 113, 113, 0.38);
+  color: #fecaca;
 }
 
 .planner-secondary-button {
@@ -393,6 +478,7 @@
 .planner-primary-button:disabled,
 .planner-secondary-button:disabled,
 .planner-ghost-button:disabled,
+.planner-icon-button:disabled,
 .planner-select:disabled,
 .planner-input:disabled {
   cursor: not-allowed;
@@ -426,6 +512,46 @@
 .planner-loading {
   margin-bottom: 24px;
   padding: 16px 18px;
+}
+
+.planner-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+}
+
+.planner-modal {
+  width: min(100%, 480px);
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9)),
+    radial-gradient(circle at top right, rgba(244, 114, 182, 0.18), transparent 32%);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+}
+
+.planner-modal-header h3,
+.planner-modal-copy strong {
+  color: #f8fafc;
+}
+
+.planner-modal-copy {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.planner-modal-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .planner-alert {
@@ -473,6 +599,11 @@
   .planner-inline-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .planner-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .planner-expense-edit-grid {
