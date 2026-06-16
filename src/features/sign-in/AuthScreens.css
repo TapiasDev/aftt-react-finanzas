@@ -70,6 +70,51 @@
   padding: 12px 14px;
 }
 
+.auth-input-with-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.auth-input-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.82);
+  color: #f8fafc;
+  padding: 12px 14px;
+  min-width: 52px;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.auth-input-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.auth-input-action:hover {
+  background: rgba(51, 65, 85, 0.92);
+  border-color: rgba(244, 114, 182, 0.34);
+}
+
+.auth-input-action:focus-visible {
+  outline: none;
+  border-color: rgba(244, 114, 182, 0.5);
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.18);
+}
+
+.auth-input-action:active {
+  transform: scale(0.98);
+}
+
 .auth-primary-button {
   background: linear-gradient(135deg, #a855f7, #ec4899);
   color: #fff;
@@ -78,7 +123,8 @@
 }
 
 .auth-primary-button:disabled,
-.auth-field input:disabled {
+.auth-field input:disabled,
+.auth-input-action:disabled {
   cursor: not-allowed;
   opacity: 0.65;
 }
