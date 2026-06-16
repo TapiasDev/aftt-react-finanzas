@@ -18,7 +18,7 @@ Usuario final que recibe ingresos quincenales y quiere controlar sus pagos con a
 
 ## Funcionalidades principales
 
-- Inicio de sesión por `email`.
+- Inicio de sesión por `username`.
 - Cambio obligatorio de contraseña para usuarios `New`.
 - Registro por año.
 - Registro por mes.

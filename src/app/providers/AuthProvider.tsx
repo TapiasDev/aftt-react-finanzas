@@ -1,5 +1,11 @@
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { authService } from '../../services/auth-service'
+import {
+  clearStoredAccessToken,
+  clearStoredAuthSession,
+  writeStoredAccessToken,
+  writeStoredAuthSession,
+} from '../../services/auth-service/auth-session.storage'
 import type { AuthSession } from '../../shared/types/auth'
 import { AuthContext, type AuthContextValue } from './AuthContext'
 
@@ -21,10 +27,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         if (isMounted) {
           setSession(storedSession)
+
+          if (storedSession) {
+            writeStoredAuthSession(storedSession)
+          } else {
+            clearStoredAccessToken()
+            clearStoredAuthSession()
+          }
         }
       } catch (caughtError) {
         if (isMounted) {
           setError(getErrorMessage(caughtError))
+          clearStoredAccessToken()
+          clearStoredAuthSession()
         }
       } finally {
         if (isMounted) {
@@ -40,12 +55,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  async function signIn(email: string, password: string) {
+  async function signIn(username: string, password: string) {
     try {
       setIsSubmitting(true)
       setError(null)
 
-      const nextSession = await authService.signIn({ email, password })
+      const loginResponse = await authService.signIn({ username, password })
+      const nextSession: AuthSession = { user: loginResponse.user }
+
+      writeStoredAccessToken(loginResponse.accessToken)
+      writeStoredAuthSession(nextSession)
       setSession(nextSession)
     } catch (caughtError) {
       const message = getErrorMessage(caughtError)
@@ -56,7 +75,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }
 
-  async function changeInitialPassword(newPassword: string, confirmPassword: string) {
+  async function changeInitialPassword(newPassword: string, confirmPassword: string, username?: string) {
     try {
       setIsSubmitting(true)
       setError(null)
@@ -64,8 +83,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
       const nextSession = await authService.changeInitialPassword({
         newPassword,
         confirmPassword,
+        username,
       })
 
+      writeStoredAuthSession(nextSession)
       setSession(nextSession)
     } catch (caughtError) {
       const message = getErrorMessage(caughtError)
@@ -82,12 +103,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setError(null)
 
       await authService.signOut()
-      setSession(null)
     } catch (caughtError) {
       const message = getErrorMessage(caughtError)
       setError(message)
       throw new Error(message, { cause: caughtError })
     } finally {
+      clearStoredAccessToken()
+      clearStoredAuthSession()
+      setSession(null)
       setIsSubmitting(false)
     }
   }

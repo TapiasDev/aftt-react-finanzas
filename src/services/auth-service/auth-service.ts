@@ -1,4 +1,5 @@
 import type {
+  AuthLoginResponse,
   AuthSession,
   ChangeInitialPasswordInput,
   SignInInput,
@@ -6,7 +7,7 @@ import type {
 
 export interface AuthService {
   getCurrentSession(): Promise<AuthSession | null>
-  signIn(input: SignInInput): Promise<AuthSession>
+  signIn(input: SignInInput): Promise<AuthLoginResponse>
   changeInitialPassword(input: ChangeInitialPasswordInput): Promise<AuthSession>
   signOut(): Promise<void>
 }

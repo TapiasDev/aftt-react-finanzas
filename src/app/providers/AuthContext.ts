@@ -7,8 +7,8 @@ export interface AuthContextValue {
   isLoading: boolean
   isSubmitting: boolean
   error: string | null
-  signIn: (email: string, password: string) => Promise<void>
-  changeInitialPassword: (newPassword: string, confirmPassword: string) => Promise<void>
+  signIn: (username: string, password: string) => Promise<void>
+  changeInitialPassword: (newPassword: string, confirmPassword: string, username?: string) => Promise<void>
   signOut: () => Promise<void>
 }
 

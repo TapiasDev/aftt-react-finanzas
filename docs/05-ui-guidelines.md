@@ -4,8 +4,9 @@
 
 La aplicación debe incluir:
 
-- Pantalla de login por `email` y contraseña.
+- Pantalla de login por `username` y contraseña.
 - Pantalla de cambio obligatorio de contraseña para usuarios `New`.
+- Campo opcional para cambiar `username` durante el primer acceso.
 - Mensaje claro cuando el usuario no puede entrar al planner sin completar el cambio.
 
 ## Vista principal

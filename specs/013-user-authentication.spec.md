@@ -2,13 +2,13 @@
 
 ## Objective
 
-Allow a user to authenticate with email and password before accessing the planner.
+Allow a user to authenticate with username and password before accessing the planner.
 
 ## Inputs
 
 | Field    | Type   | Required |
 | -------- | ------ | -------- |
-| email    | string | yes      |
+| username | string | yes      |
 | password | string | yes      |
 
 ## Outputs
@@ -20,7 +20,7 @@ Allow a user to authenticate with email and password before accessing the planne
 
 ## Business Rules
 
-- Authentication uses `email` and password.
+- Authentication uses `username` and password.
 - Only existing users can authenticate.
 - Invalid credentials must be rejected.
 - User state must be returned after authentication.
@@ -29,7 +29,7 @@ Allow a user to authenticate with email and password before accessing the planne
 
 ### AC-001
 
-Given a valid email and password
+Given a valid username and password
 When the user signs in
 Then the system creates an authenticated session.
 

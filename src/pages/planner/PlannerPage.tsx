@@ -25,7 +25,7 @@ export function PlannerPage() {
       <section className='planner-topbar'>
         <div>
           <p className='planner-topbar-kicker'>Bienvenido</p>
-          <strong>{currentUser?.email ?? 'Sin sesion'}</strong>
+          <strong>{currentUser?.username ?? 'Sin sesion'}</strong>
         </div>
 
         <SignOutButton />

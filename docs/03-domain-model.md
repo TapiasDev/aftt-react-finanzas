@@ -6,7 +6,7 @@
 
 ```txt
 id
-email
+username
 status: New | Active
 passwordHash
 createdAt

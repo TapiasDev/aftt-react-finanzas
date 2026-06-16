@@ -6,7 +6,7 @@ Complementar `docs/api-contract.md` con una guía más operativa para backend: t
 
 ## Supuestos
 
-- Autenticación por cookie de sesión.
+- Autenticación por bearer token.
 - Un usuario solo puede ver y modificar su propia información.
 - Los usuarios se crean manualmente en la base de datos.
 - El primer login puede ocurrir con contraseña temporal.
@@ -18,7 +18,7 @@ Complementar `docs/api-contract.md` con una guía más operativa para backend: t
 
 ```txt
 id uuid pk
-email varchar unique not null
+username varchar unique not null
 password_hash varchar not null
 status varchar not null check in (New, Active)
 created_at timestamptz not null
@@ -26,7 +26,7 @@ updated_at timestamptz not null
 ```
 
 Notas:
-- `email` en minúsculas.
+- `username` en minúsculas.
 - `password_hash` debe almacenar la contraseña temporal o final ya hasheada.
 
 ### `year_periods`
@@ -108,7 +108,7 @@ Request DTO:
 
 ```ts
 interface LoginRequestDto {
-  email: string
+  username: string
   password: string
 }
 ```
@@ -118,12 +118,16 @@ Response DTO:
 ```ts
 interface AuthUserDto {
   id: string
-  email: string
+  username: string
   status: 'New' | 'Active'
 }
 
 interface AuthSessionDto {
   user: AuthUserDto
+}
+
+interface AuthLoginResponseDto extends AuthSessionDto {
+  accessToken: string
 }
 ```
 
@@ -135,6 +139,7 @@ Request DTO:
 interface ChangeInitialPasswordRequestDto {
   newPassword: string
   confirmPassword: string
+  username?: string
 }
 ```
 
@@ -314,7 +319,7 @@ type CloseMonthResponseDto = MonthDetailDto
 
 ## Auth
 
-- `email` requerido.
+- `username` requerido.
 - `password` requerida.
 - `newPassword` requerida.
 - `newPassword.length >= 8`.
@@ -338,10 +343,10 @@ type CloseMonthResponseDto = MonthDetailDto
 
 ```txt
 AuthService
-  - signIn(email, password)
-  - getCurrentSession(session)
-  - changeInitialPassword(userId, newPassword, confirmPassword)
-  - signOut(session)
+  - signIn(username, password)
+  - getCurrentSession(token)
+  - changeInitialPassword(token, newPassword, confirmPassword, username?)
+  - signOut(token)
 ```
 
 ### Planner
@@ -387,15 +392,15 @@ where e.id = :expenseId
 
 ### Auth
 
-- Implementar login por `email`.
-- Implementar sesión por cookie.
+- Implementar login por `username`.
+- Implementar sesión por bearer token.
 - Implementar `GET /auth/me`.
 - Implementar cambio obligatorio de contraseña.
 - Cambiar `status` de `New` a `Active` al completar el flujo.
 
 ### Planner
 
-- Crear servicio que siempre reciba `currentUserId` desde la sesión.
+- Crear servicio que siempre reciba `currentUserId` desde el token autenticado.
 - Filtrar todos los accesos por ownership.
 - Proteger mutaciones de meses cerrados.
 - Recalcular correctamente el estado pagado y `paidAt`.
@@ -418,7 +423,7 @@ where e.id = :expenseId
 
 ## Decisiones pendientes para backend
 
-- Tecnología de sesión: cookie firmada, JWT en cookie, o framework session.
+- Tecnología de sesión: bearer token opaco persistido en MongoDB.
 - Política final de password: mínimo, complejidad, rotación.
 - Estrategia de seed inicial para usuarios creados manualmente.
 - Si el backend creará automáticamente los 12 meses y 2 quincenas o si lo hará bajo demanda.

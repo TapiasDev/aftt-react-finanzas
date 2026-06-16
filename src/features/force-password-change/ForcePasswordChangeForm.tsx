@@ -4,6 +4,7 @@ import '../sign-in/AuthScreens.css'
 
 export function ForcePasswordChangeForm() {
   const { currentUser, changeInitialPassword, isSubmitting, error } = useAuth()
+  const [username, setUsername] = useState(currentUser?.username ?? '')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState<string | null>(null)
@@ -12,7 +13,7 @@ export function ForcePasswordChangeForm() {
     event.preventDefault()
 
     try {
-      await changeInitialPassword(newPassword, confirmPassword)
+      await changeInitialPassword(newPassword, confirmPassword, username)
       setMessage('Contrasena actualizada. Ya puedes usar el planner.')
     } catch (caughtError) {
       setMessage(
@@ -28,12 +29,21 @@ export function ForcePasswordChangeForm() {
           <p className="auth-kicker">Primer acceso</p>
           <h1>Cambio obligatorio de contrasena</h1>
           <p>
-            El usuario <code>{currentUser?.email}</code> todavia esta en estado <code>New</code>.
-            Debe registrar su propia contrasena antes de entrar al planner.
+            El usuario <code>{currentUser?.username}</code> todavia esta en estado <code>New</code>.
+            Debe registrar su propia contrasena antes de entrar al planner. Si lo desea,
+            tambien puede cambiar su usuario en este paso.
           </p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          <label className="auth-field">
+            <span>Usuario opcional</span>
+            <input
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+          </label>
+
           <label className="auth-field">
             <span>Nueva contrasena</span>
             <input

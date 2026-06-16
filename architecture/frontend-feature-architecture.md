@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Construir el frontend con una arquitectura por features que permita empezar con servicios mock y luego cambiar a una API real sin reescribir la UI.
+Construir el frontend con una arquitectura por features conectada directamente a la API real sin reescribir la UI.
 
 ## Capas
 
@@ -57,7 +57,7 @@ src/
 ### `services`
 
 - Contratos de acceso a datos.
-- Implementaciones `mock` y luego `api`.
+- Implementaciones `api`.
 
 ## Regla de dependencias
 
@@ -72,15 +72,10 @@ src/
 
 - La UI consume una interfaz `AuthService` para autenticación.
 - La UI consume una interfaz `PlannerService`.
-- Las implementaciones actuales por defecto son `authServiceMock` y `plannerServiceMock`.
-- Cuando exista backend real, se agregará `authServiceApi` y `plannerServiceApi` manteniendo los mismos contratos.
+- Las implementaciones actuales usan `authServiceApi` y `plannerServiceApi`.
 - El servicio activo sale de `src/services/planner-service/index.ts`.
 - El servicio auth activo sale de `src/services/auth-service/index.ts`.
-- `VITE_PLANNER_SERVICE_MODE=mock` usa datos locales.
-- `VITE_PLANNER_SERVICE_MODE=api` activa el adapter listo para conectar endpoints reales.
-- `VITE_AUTH_SERVICE_MODE=mock` usa usuarios mock.
-- `VITE_AUTH_SERVICE_MODE=api` activa el adapter listo para el backend real.
-- Los adapters `api` usan `fetch` con `credentials: 'include'`.
+- Los adapters `api` usan `fetch` con `Authorization: Bearer <token>`.
 - La URL base sale de `VITE_API_BASE_URL`.
 
 ## Estado de aplicación
@@ -116,7 +111,7 @@ src/
 4. Registro y edición de gastos.
 5. Cambio de estado pagado/pendiente.
 6. Cierre de mes y modo readonly.
-7. Sustitución de mocks por API real.
+7. Integración completa con la API real.
 
 ## Contrato actual mínimo
 
@@ -147,25 +142,11 @@ PUT    /planner/expenses/:expenseId
 PATCH  /planner/months/:monthId/close
 ```
 
-## Seleccion de implementacion
+## Configuracion
 
 ```txt
-VITE_PLANNER_SERVICE_MODE=mock
+VITE_API_BASE_URL=http://localhost:8000
 ```
-
-```txt
-VITE_PLANNER_SERVICE_MODE=api
-```
-
-```txt
-VITE_AUTH_SERVICE_MODE=mock
-```
-
-```txt
-VITE_AUTH_SERVICE_MODE=api
-```
-
-- Si las variables no existen, la app usa `mock` por defecto.
 
 ## Extensiones siguientes
 

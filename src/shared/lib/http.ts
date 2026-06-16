@@ -1,3 +1,5 @@
+import { readStoredAccessToken } from '../../services/auth-service/auth-session.storage'
+
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: unknown
@@ -11,12 +13,10 @@ interface ApiErrorPayload {
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const accessToken = readStoredAccessToken()
   const response = await fetch(`${apiBaseUrl}${path}`, {
     method: options.method ?? 'GET',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: buildHeaders(accessToken),
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
 
@@ -32,12 +32,15 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 export async function apiRequestOrNull<T>(path: string): Promise<T | null> {
+  const accessToken = readStoredAccessToken()
+
+  if (!accessToken) {
+    return null
+  }
+
   const response = await fetch(`${apiBaseUrl}${path}`, {
     method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: buildHeaders(accessToken),
   })
 
   if (response.status === 401) {
@@ -66,4 +69,11 @@ async function createApiError(response: Response) {
   }
 
   return new Error(message)
+}
+
+function buildHeaders(accessToken: string | null): HeadersInit {
+  return {
+    'Content-Type': 'application/json',
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  }
 }
