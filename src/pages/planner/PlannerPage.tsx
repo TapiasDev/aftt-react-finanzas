@@ -3,6 +3,7 @@ import { usePlanner } from '../../app/providers/usePlanner';
 import { CloseMonthCard } from '../../features/close-month/CloseMonthCard';
 import { FortnightIncomeCard } from '../../features/edit-fortnight-income/FortnightIncomeCard';
 import { RegisterExpenseForm } from '../../features/register-expense/RegisterExpenseForm';
+import { getDaysUntil } from '../../shared/lib/date';
 import { SignOutButton } from '../../features/sign-out/SignOutButton';
 import { ExpenseList } from '../../widgets/expense-list/ExpenseList';
 import { MonthlyCalendar } from '../../widgets/monthly-calendar/MonthlyCalendar';
@@ -19,6 +20,9 @@ export function PlannerPage() {
     selectedFortnight,
     selectedFortnightExpenses,
   } = usePlanner();
+  const pendingExpenses = selectedFortnightExpenses.filter((expense) => expense.status === 'Pending');
+  const overdueExpenses = pendingExpenses.filter((expense) => getDaysUntil(expense.estimatedPaymentDate) < 0);
+  const heroTone = getHeroTone(selectedFortnightExpenses.length, pendingExpenses.length, overdueExpenses.length);
 
   return (
     <main className='planner-shell'>
@@ -40,7 +44,7 @@ export function PlannerPage() {
           </p>
         </div>
 
-        <div className='planner-hero-card'>
+        <div className={`planner-hero-card planner-hero-card-${heroTone}`}>
           <span>
             {selectedMonth?.status === 'Closed'
               ? 'Modo readonly'
@@ -55,6 +59,13 @@ export function PlannerPage() {
             {selectedFortnightExpenses.length} gastos visibles en la quincena
             seleccionada
           </p>
+          <small>
+            {overdueExpenses.length > 0
+              ? `${overdueExpenses.length} vencidos`
+              : pendingExpenses.length > 0
+                ? `${pendingExpenses.length} pendientes por cubrir`
+                : 'Sin pendientes en esta quincena'}
+          </small>
         </div>
       </section>
 
@@ -81,4 +92,20 @@ export function PlannerPage() {
       </div>
     </main>
   );
+}
+
+function getHeroTone(totalExpenses: number, pendingExpenses: number, overdueExpenses: number) {
+  if (totalExpenses === 0) {
+    return 'neutral';
+  }
+
+  if (overdueExpenses > 0) {
+    return 'danger';
+  }
+
+  if (pendingExpenses > 0) {
+    return 'warning';
+  }
+
+  return 'success';
 }
