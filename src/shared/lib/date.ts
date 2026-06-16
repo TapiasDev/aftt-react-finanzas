@@ -1,6 +1,10 @@
 import type { CalendarCell, FortnightType } from '../types/planner'
 
 const weekDayFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short' })
+const shortDateFormatter = new Intl.DateTimeFormat('es-CO', {
+  day: 'numeric',
+  month: 'short',
+})
 
 export function getMonthName(year: number, monthNumber: number) {
   return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(
@@ -60,6 +64,24 @@ export function toIsoDate(year: number, monthNumber: number, dayNumber: number) 
 
 export function getDayNumberFromIso(date: string) {
   return Number(date.slice(-2))
+}
+
+export function getTodayIsoDate() {
+  const now = new Date()
+  return toIsoDate(now.getFullYear(), now.getMonth() + 1, now.getDate())
+}
+
+export function getDaysUntil(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  const [todayYear, todayMonth, todayDay] = getTodayIsoDate().split('-').map(Number)
+  const targetUtc = Date.UTC(year, month - 1, day)
+  const todayUtc = Date.UTC(todayYear, todayMonth - 1, todayDay)
+  return Math.round((targetUtc - todayUtc) / (1000 * 60 * 60 * 24))
+}
+
+export function formatShortDateLabel(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  return capitalize(shortDateFormatter.format(new Date(year, month - 1, day)).replace('.', ''))
 }
 
 function capitalize(value: string) {

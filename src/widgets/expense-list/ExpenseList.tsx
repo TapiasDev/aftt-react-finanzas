@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
+import { getDayNumberFromIso, getDaysUntil } from '../../shared/lib/date'
 import { formatMoney } from '../../shared/lib/format'
 import type { Expense, ExpenseApplyScope } from '../../shared/types/planner'
+
+type ExpenseFilter = 'all' | 'pending' | 'paid' | 'overdue'
 
 interface EditFormState {
   name: string
@@ -22,6 +25,12 @@ interface EditDialogState {
   isRecurring: boolean
 }
 
+interface DuplicateDialogState {
+  expense: Expense
+}
+
+type DuplicateTarget = 'same_fortnight' | 'other_fortnight'
+
 const emptyEditForm: EditFormState = {
   name: '',
   amount: '',
@@ -34,6 +43,7 @@ export function ExpenseList() {
     selectedFortnightExpenses,
     selectedMonth,
     selectedFortnight,
+    createExpense,
     toggleExpenseStatus,
     isTogglingExpense,
     updateExpense,
@@ -46,6 +56,9 @@ export function ExpenseList() {
   const [editForm, setEditForm] = useState<EditFormState>(emptyEditForm)
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState | null>(null)
   const [deleteScope, setDeleteScope] = useState<ExpenseApplyScope>('current')
+  const [duplicateDialog, setDuplicateDialog] = useState<DuplicateDialogState | null>(null)
+  const [duplicateTarget, setDuplicateTarget] = useState<DuplicateTarget>('same_fortnight')
+  const [selectedFilter, setSelectedFilter] = useState<ExpenseFilter>('all')
   const [message, setMessage] = useState<string | null>(null)
 
   if (!selectedMonth) {
@@ -55,6 +68,7 @@ export function ExpenseList() {
   const isClosed = selectedMonth.status === 'Closed'
   const minDate = selectedFortnight?.startDate ?? ''
   const maxDate = selectedFortnight?.endDate ?? ''
+  const filteredExpenses = selectedFortnightExpenses.filter((expense) => matchesFilter(expense, selectedFilter))
 
   function startEditing(expense: Expense) {
     setMessage(null)
@@ -163,6 +177,60 @@ export function ExpenseList() {
     }
   }
 
+  function openDuplicateDialog(expense: Expense) {
+    setDuplicateTarget('same_fortnight')
+    setDuplicateDialog({ expense })
+  }
+
+  function closeDuplicateDialog() {
+    setDuplicateDialog(null)
+    setDuplicateTarget('same_fortnight')
+  }
+
+  async function confirmDuplicate() {
+    if (!duplicateDialog || !selectedMonth) {
+      return
+    }
+
+    const sourceExpense = duplicateDialog.expense
+    const sourceFortnight = selectedMonth.fortnights.find((fortnight) => fortnight.id === sourceExpense.fortnightPeriodId)
+
+    if (!sourceFortnight) {
+      setMessage('No se pudo identificar la quincena origen del gasto.')
+      return
+    }
+
+    const targetFortnight =
+      duplicateTarget === 'same_fortnight'
+        ? sourceFortnight
+        : selectedMonth.fortnights.find((fortnight) => fortnight.type !== sourceFortnight.type)
+
+    if (!targetFortnight) {
+      setMessage('No se pudo identificar la quincena destino del gasto.')
+      return
+    }
+
+    const duplicatedDate =
+      duplicateTarget === 'same_fortnight'
+        ? sourceExpense.estimatedPaymentDate
+        : buildDuplicateDate(sourceExpense.estimatedPaymentDate, sourceFortnight.startDate, targetFortnight.startDate, targetFortnight.endDate)
+
+    try {
+      await createExpense({
+        fortnightPeriodId: targetFortnight.id,
+        name: `${sourceExpense.name} copia`,
+        amount: sourceExpense.amount,
+        estimatedPaymentDate: duplicatedDate,
+        description: sourceExpense.description,
+        recurrenceMode: 'none',
+      })
+      setMessage('Gasto duplicado correctamente.')
+      closeDuplicateDialog()
+    } catch (caughtError) {
+      setMessage(caughtError instanceof Error ? caughtError.message : 'Unexpected duplicate error.')
+    }
+  }
+
   return (
     <section className="planner-panel">
       <div className="planner-panel-header">
@@ -176,17 +244,37 @@ export function ExpenseList() {
       </div>
 
       <div className="planner-expense-list">
-        {selectedFortnightExpenses.length === 0 ? (
+        <div className="planner-filter-group" role="tablist" aria-label="Filtros de gastos">
+          {[
+            ['all', 'Todos'],
+            ['pending', 'Pendientes'],
+            ['paid', 'Pagados'],
+            ['overdue', 'Vencidos'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={`planner-filter-chip${selectedFilter === value ? ' is-active' : ''}`}
+              onClick={() => setSelectedFilter(value as ExpenseFilter)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {filteredExpenses.length === 0 ? (
           <p className="planner-empty-copy">No hay gastos registrados en esta quincena.</p>
         ) : null}
 
-        {selectedFortnightExpenses.map((expense) => {
+        {filteredExpenses.map((expense) => {
           const isPaid = expense.status === 'Paid'
           const isEditing = editingExpenseId === expense.id
           const isRecurring = Boolean(expense.recurrenceId)
+          const dueTone = getExpenseDueTone(expense)
+          const dueCopy = getExpenseDueCopy(expense)
 
           return (
-            <article key={expense.id} className="planner-expense-row">
+            <article key={expense.id} className={`planner-expense-row planner-expense-row-${dueTone}`}>
               <div className="planner-expense-content">
                 {isEditing ? (
                   <div className="planner-expense-edit-grid">
@@ -243,7 +331,13 @@ export function ExpenseList() {
                     <p>
                       {expense.estimatedPaymentDate} · {formatMoney(expense.amount)}
                     </p>
-                    {isRecurring ? <small>Recurrente{expense.isAutoGenerated ? ' · autogenerado' : ''}</small> : null}
+                    <div className="planner-expense-meta-row">
+                      <small className={`planner-expense-badge planner-expense-badge-${expense.status.toLowerCase()}`}>
+                        {expense.status === 'Paid' ? 'Pagado' : 'Pendiente'}
+                      </small>
+                      {dueCopy ? <small className={`planner-expense-badge planner-expense-badge-${dueTone}`}>{dueCopy}</small> : null}
+                      {isRecurring ? <small className="planner-expense-badge planner-expense-badge-recurring">Recurrente{expense.isAutoGenerated ? ' auto' : ''}</small> : null}
+                    </div>
                     {expense.description ? <small>{expense.description}</small> : null}
                   </div>
                 )}
@@ -291,6 +385,17 @@ export function ExpenseList() {
                     <EditIcon />
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  className="planner-icon-button"
+                  onClick={() => openDuplicateDialog(expense)}
+                  disabled={isClosed || isSavingExpense}
+                  aria-label="Duplicar gasto"
+                  title="Duplicar gasto"
+                >
+                  <DuplicateIcon />
+                </button>
 
                 <button
                   type="button"
@@ -396,8 +501,113 @@ export function ExpenseList() {
           </div>
         </div>
       ) : null}
+
+      {duplicateDialog ? (
+        <div className="planner-modal-backdrop" role="presentation">
+          <div className="planner-modal" role="dialog" aria-modal="true" aria-labelledby="duplicate-expense-title">
+            <div className="planner-modal-header">
+              <div>
+                <p className="planner-kicker">Duplicar gasto</p>
+                <h3 id="duplicate-expense-title">Crear copia</h3>
+              </div>
+            </div>
+
+            <p className="planner-modal-copy">
+              Elige dónde crear la copia de <strong>{duplicateDialog.expense.name}</strong>.
+            </p>
+
+            <label className="planner-field">
+              <span className="planner-label">Destino</span>
+              <select
+                className="planner-select"
+                value={duplicateTarget}
+                onChange={(event) => setDuplicateTarget(event.target.value as DuplicateTarget)}
+                disabled={isSavingExpense}
+              >
+                <option value="same_fortnight">Esta misma quincena</option>
+                <option value="other_fortnight">La otra quincena del mes</option>
+              </select>
+            </label>
+
+            <div className="planner-modal-actions">
+              <button type="button" className="planner-secondary-button" onClick={() => void confirmDuplicate()} disabled={isSavingExpense}>
+                {isSavingExpense ? 'Duplicando...' : 'Crear copia'}
+              </button>
+              <button type="button" className="planner-ghost-button" onClick={closeDuplicateDialog} disabled={isSavingExpense}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
+}
+
+function buildDuplicateDate(originalDate: string, sourceStartDate: string, targetStartDate: string, targetEndDate: string) {
+  const offset = getDayNumberFromIso(originalDate) - getDayNumberFromIso(sourceStartDate)
+  const targetDay = Math.min(getDayNumberFromIso(targetStartDate) + offset, getDayNumberFromIso(targetEndDate))
+  return `${targetStartDate.slice(0, 8)}${String(targetDay).padStart(2, '0')}`
+}
+
+function matchesFilter(expense: Expense, selectedFilter: ExpenseFilter) {
+  if (selectedFilter === 'all') {
+    return true
+  }
+
+  if (selectedFilter === 'paid') {
+    return expense.status === 'Paid'
+  }
+
+  if (selectedFilter === 'pending') {
+    return expense.status === 'Pending'
+  }
+
+  return expense.status === 'Pending' && getDaysUntil(expense.estimatedPaymentDate) < 0
+}
+
+function getExpenseDueTone(expense: Expense) {
+  if (expense.status === 'Paid') {
+    return 'paid'
+  }
+
+  const daysUntil = getDaysUntil(expense.estimatedPaymentDate)
+
+  if (daysUntil < 0) {
+    return 'overdue'
+  }
+
+  if (daysUntil <= 3) {
+    return 'soon'
+  }
+
+  return 'pending'
+}
+
+function getExpenseDueCopy(expense: Expense) {
+  if (expense.status === 'Paid') {
+    return null
+  }
+
+  const daysUntil = getDaysUntil(expense.estimatedPaymentDate)
+
+  if (daysUntil < 0) {
+    return 'Vencido'
+  }
+
+  if (daysUntil === 0) {
+    return 'Vence hoy'
+  }
+
+  if (daysUntil === 1) {
+    return 'Vence mañana'
+  }
+
+  if (daysUntil <= 3) {
+    return `Vence en ${daysUntil} días`
+  }
+
+  return null
 }
 
 function EditIcon() {
@@ -455,6 +665,29 @@ function DeleteIcon() {
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function DuplicateIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M9 9h10v10H9z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 15H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

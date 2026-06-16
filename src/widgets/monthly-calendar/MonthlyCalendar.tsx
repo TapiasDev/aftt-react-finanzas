@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
-import { getCalendarCells, getDayNumberFromIso, getWeekdayLabels } from '../../shared/lib/date'
+import { formatShortDateLabel, getCalendarCells, getDayNumberFromIso, getWeekdayLabels } from '../../shared/lib/date'
 import { formatMoney } from '../../shared/lib/format'
 
 const weekdayLabels = getWeekdayLabels()
@@ -15,6 +15,26 @@ export function MonthlyCalendar() {
 
     return getCalendarCells(selectedMonth.year, selectedMonth.monthNumber)
   }, [selectedMonth])
+
+  const agendaItems = useMemo(() => {
+    if (!selectedMonth) {
+      return []
+    }
+
+    return calendarCells
+      .filter((cell) => cell.isCurrentMonth)
+      .map((cell) => {
+        const expenses = selectedMonth.expenses.filter(
+          (expense) => getDayNumberFromIso(expense.estimatedPaymentDate) === cell.dayNumber,
+        )
+
+        return {
+          ...cell,
+          expenses,
+        }
+      })
+      .filter((item) => item.expenses.length > 0)
+  }, [calendarCells, selectedMonth])
 
   if (!selectedMonth) {
     return null
@@ -75,6 +95,37 @@ export function MonthlyCalendar() {
             </article>
           )
         })}
+      </div>
+
+      <div className="planner-agenda-list">
+        {agendaItems.length === 0 ? <p className="planner-empty-copy">No hay gastos programados en este mes.</p> : null}
+
+        {agendaItems.map((item) => (
+          <article key={item.date} className={`planner-agenda-day${selectedFortnightType === item.fortnightType ? ' is-selected' : ''}`}>
+            <header className="planner-agenda-day-header">
+              <div>
+                <p className="planner-kicker">{item.fortnightType === 'First' ? 'Primera quincena' : 'Segunda quincena'}</p>
+                <h3>{formatShortDateLabel(item.date)}</h3>
+              </div>
+              <span className="planner-agenda-day-count">{item.expenses.length} gasto{item.expenses.length === 1 ? '' : 's'}</span>
+            </header>
+
+            <div className="planner-agenda-expenses">
+              {item.expenses.map((expense) => (
+                <div key={expense.id} className={`planner-agenda-expense is-${expense.status.toLowerCase()}`}>
+                  <div>
+                    <strong>{expense.name}</strong>
+                    <p>{expense.description || 'Sin descripción'}</p>
+                  </div>
+                  <div className="planner-agenda-expense-meta">
+                    <strong>{formatMoney(expense.amount)}</strong>
+                    <span>{expense.status === 'Paid' ? 'Pagado' : 'Pendiente'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   )
