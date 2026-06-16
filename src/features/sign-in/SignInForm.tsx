@@ -4,7 +4,7 @@ import './AuthScreens.css';
 
 export function SignInForm() {
   const { signIn, isSubmitting, error } = useAuth();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
@@ -12,7 +12,7 @@ export function SignInForm() {
     event.preventDefault();
 
     try {
-      await signIn(email, password);
+      await signIn(username, password);
       setMessage(null);
     } catch (caughtError) {
       setMessage(
@@ -33,10 +33,10 @@ export function SignInForm() {
 
         <form className='auth-form' onSubmit={handleSubmit}>
           <label className='auth-field'>
-            <span>Email</span>
+            <span>Usuario</span>
             <input
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
             />
           </label>
 

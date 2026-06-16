@@ -66,7 +66,7 @@ Solo usuarios autenticados pueden acceder a la aplicación.
 
 ## BR-017
 
-El acceso a la aplicación se realiza con `email` y contraseña.
+El acceso a la aplicación se realiza con `username` y contraseña.
 
 ## BR-018
 

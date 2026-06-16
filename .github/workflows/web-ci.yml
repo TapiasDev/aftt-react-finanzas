@@ -1,0 +1,37 @@
+name: Web CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'index.html'
+      - 'eslint.config.js'
+      - '.github/workflows/web-ci.yml'
+
+  workflow_dispatch:
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    env:
+      VITE_API_URL: https://tu-api.onrender.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build

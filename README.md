@@ -8,8 +8,8 @@ Sistema para registrar ingresos y gastos por año, mes y quincena con acceso pri
 
 Permitir que un usuario final pueda:
 
-- Iniciar sesión con `email` y contraseña.
-- Cambiar su contraseña en el primer acceso si su estado es `New`.
+- Iniciar sesión con `username` y contraseña.
+- Cambiar su contraseña en el primer acceso si su estado es `New`, con cambio opcional de `username`.
 - Seleccionar un año.
 - Seleccionar un mes.
 - Registrar gastos por primera o segunda quincena.
@@ -22,28 +22,24 @@ Permitir que un usuario final pueda:
 ## Reglas de usuarios
 
 - Los usuarios se crean manualmente en la base de datos.
-- Cada usuario ingresa con `email`.
+- Cada usuario ingresa con `username`.
 - Los estados disponibles son `New` y `Active`.
 - Si el usuario está en estado `New`, el sistema exige cambio de contraseña antes de entrar al planner.
 - Los datos financieros son privados por usuario.
 
-## Mock actual para pruebas
+## Usuarios de ejemplo
 
-- Usuario nuevo: `new.user@example.com` / `Temp12345`
-- Usuario activo: `active.user@example.com` / `Active12345`
+- Usuario nuevo: `new.user` / `Temp12345`
+- Usuario activo: `active.user` / `Active12345`
 
 ## Configuración de servicios
 
 Variables disponibles:
 
 ```txt
-VITE_AUTH_SERVICE_MODE=mock
-VITE_PLANNER_SERVICE_MODE=mock
-VITE_API_BASE_URL=http://localhost:3000
+VITE_API_BASE_URL=http://localhost:8000
 ```
 
-- `mock` usa datos locales para pruebas.
-- `api` usa `fetch` contra el backend real.
 - `VITE_API_BASE_URL` define la URL base del backend.
 
 ## Estructura SDD
@@ -57,7 +53,7 @@ tasks/
 
 ## Flujo principal
 
-1. Usuario ingresa con `email` y contraseña.
+1. Usuario ingresa con `username` y contraseña.
 2. Si el estado es `New`, el sistema obliga el cambio de contraseña.
 3. Usuario entra al planner con estado `Active`.
 4. Usuario selecciona año.

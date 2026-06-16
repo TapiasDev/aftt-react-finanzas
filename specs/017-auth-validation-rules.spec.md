@@ -8,7 +8,7 @@ Centralize validation rules for authentication and first password change.
 
 | Field           | Type   |
 | --------------- | ------ |
-| email           | string |
+| username        | string |
 | password        | string |
 | newPassword     | string |
 | confirmPassword | string |
@@ -22,7 +22,7 @@ Centralize validation rules for authentication and first password change.
 
 ## Business Rules
 
-- Email is required.
+- Username is required.
 - Password is required.
 - New password is required.
 - New password must contain at least 8 characters.
@@ -33,7 +33,7 @@ Centralize validation rules for authentication and first password change.
 
 ### AC-001
 
-Given an empty email
+Given an empty username
 When authentication validation runs
 Then the system returns a validation error.
 

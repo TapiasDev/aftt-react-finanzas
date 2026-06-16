@@ -7,8 +7,8 @@ Definir el contrato HTTP esperado entre frontend y backend para autenticación y
 ## Convenciones generales
 
 - Base URL configurable con `VITE_API_BASE_URL`.
-- El frontend usa `credentials: include`.
-- La autenticación se asume por cookie de sesión.
+- El frontend usa `Authorization: Bearer <accessToken>`.
+- La autenticación se basa en bearer token persistido en cliente.
 - Todas las respuestas son JSON, excepto `204 No Content`.
 - Todas las fechas usan formato ISO 8601.
 - Todos los montos se envían como `number`.
@@ -38,7 +38,7 @@ Codigos sugeridos:
 ```json
 {
   "id": "user-001",
-  "email": "new.user@example.com",
+  "username": "new.user",
   "status": "New"
 }
 ```
@@ -49,7 +49,7 @@ Codigos sugeridos:
 {
   "user": {
     "id": "user-001",
-    "email": "new.user@example.com",
+    "username": "new.user",
     "status": "New"
   }
 }
@@ -111,12 +111,26 @@ Codigos sugeridos:
 }
 ```
 
+### AuthLoginResponse
+
+```json
+{
+  "accessToken": "token-value",
+  "user": {
+    "id": "user-001",
+    "username": "new.user",
+    "status": "New"
+  }
+}
+```
+
 ## Auth
 
 ### GET `/auth/me`
 
 Uso:
 - Recupera la sesión actual.
+- Requiere `Authorization: Bearer <accessToken>`.
 
 Respuestas:
 - `200 OK`
@@ -125,7 +139,7 @@ Respuestas:
 {
   "user": {
     "id": "user-002",
-    "email": "active.user@example.com",
+    "username": "active.user",
     "status": "Active"
   }
 }
@@ -145,7 +159,7 @@ Request:
 
 ```json
 {
-  "email": "new.user@example.com",
+  "username": "new.user",
   "password": "Temp12345"
 }
 ```
@@ -155,9 +169,10 @@ Respuestas:
 
 ```json
 {
+  "accessToken": "token-value",
   "user": {
     "id": "user-001",
-    "email": "new.user@example.com",
+    "username": "new.user",
     "status": "New"
   }
 }
@@ -167,18 +182,21 @@ Respuestas:
 
 ```json
 {
-  "message": "Invalid email or password."
+  "message": "Invalid username or password."
 }
 ```
 
 ### POST `/auth/change-initial-password`
+
+Requiere `Authorization: Bearer <accessToken>`.
 
 Request:
 
 ```json
 {
   "newPassword": "MyOwnPassword123",
-  "confirmPassword": "MyOwnPassword123"
+  "confirmPassword": "MyOwnPassword123",
+  "username": "my.own.user"
 }
 ```
 
@@ -189,7 +207,7 @@ Respuestas:
 {
   "user": {
     "id": "user-001",
-    "email": "new.user@example.com",
+    "username": "my.own.user",
     "status": "Active"
   }
 }
@@ -212,6 +230,8 @@ Respuestas:
 ```
 
 ### POST `/auth/logout`
+
+Requiere `Authorization: Bearer <accessToken>`.
 
 Request:
 

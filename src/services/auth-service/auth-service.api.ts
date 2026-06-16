@@ -1,5 +1,10 @@
 import { apiRequest, apiRequestOrNull } from '../../shared/lib/http'
-import type { AuthSession, ChangeInitialPasswordInput, SignInInput } from '../../shared/types/auth'
+import type {
+  AuthLoginResponse,
+  AuthSession,
+  ChangeInitialPasswordInput,
+  SignInInput,
+} from '../../shared/types/auth'
 import type { AuthService } from './auth-service'
 
 export const authServiceApi: AuthService = {
@@ -8,7 +13,7 @@ export const authServiceApi: AuthService = {
   },
 
   async signIn(input: SignInInput) {
-    return apiRequest<AuthSession>('/auth/login', {
+    return apiRequest<AuthLoginResponse>('/auth/login', {
       method: 'POST',
       body: input,
     })

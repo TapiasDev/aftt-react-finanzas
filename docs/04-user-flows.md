@@ -2,7 +2,7 @@
 
 ## Flow 001 - Iniciar sesión
 
-1. Usuario ingresa `email` y contraseña.
+1. Usuario ingresa `username` y contraseña.
 2. Sistema valida las credenciales.
 3. Sistema identifica el estado del usuario.
 4. Si el usuario está `Active`, entra al planner.
@@ -13,9 +13,10 @@
 1. Usuario inicia sesión con contraseña temporal.
 2. Sistema detecta estado `New`.
 3. Usuario registra nueva contraseña y confirmación.
-4. Sistema valida la nueva contraseña.
-5. Sistema actualiza el estado a `Active`.
-6. Usuario entra al planner.
+4. Usuario puede conservar su `username` actual o registrar uno nuevo.
+5. Sistema valida la nueva contraseña.
+6. Sistema actualiza el estado a `Active`.
+7. Usuario entra al planner.
 
 ## Flow 003 - Registrar gastos
 

@@ -59,11 +59,11 @@ export function validateExpenseInput(input: ExpenseValidationInput): ValidationR
   }
 }
 
-export function validateSignInInput(email: string, password: string): AuthValidationResult {
+export function validateSignInInput(username: string, password: string): AuthValidationResult {
   const errors: string[] = []
 
-  if (!email.trim()) {
-    errors.push('Email is required.')
+  if (!username.trim()) {
+    errors.push('Username is required.')
   }
 
   if (!password.trim()) {
