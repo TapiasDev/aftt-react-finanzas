@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
 import { formatMoney } from '../../shared/lib/format'
 
@@ -10,12 +10,21 @@ export function FortnightIncomeCard() {
   })
   const [message, setMessage] = useState<string | null>(null)
 
+  const selectedFortnightId = selectedFortnight?.id ?? 'empty'
+  const selectedFortnightIncome = selectedFortnight?.incomeAmount ?? 0
+
+  useEffect(() => {
+    setDraft({
+      fortnightId: selectedFortnightId,
+      amount: String(selectedFortnightIncome),
+    })
+    setMessage(null)
+  }, [selectedFortnightId, selectedFortnightIncome])
+
   if (!selectedFortnight || !selectedMonth) {
     return null
   }
 
-  const selectedFortnightId = selectedFortnight.id
-  const selectedFortnightIncome = selectedFortnight.incomeAmount
   const isClosed = selectedMonth.status === 'Closed'
   const displayedAmount =
     draft.fortnightId === selectedFortnightId ? draft.amount : String(selectedFortnightIncome)

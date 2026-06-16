@@ -73,7 +73,7 @@ export function PlannerPage() {
         </div>
 
         <aside className='planner-side-column'>
-          <FortnightIncomeCard key={selectedFortnight?.id ?? 'empty'} />
+          <FortnightIncomeCard />
           <RegisterExpenseForm key={selectedFortnight?.id ?? 'empty'} />
           <CloseMonthCard />
           <FortnightSummary />
