@@ -1,6 +1,5 @@
 import { apiRequest } from '../../shared/lib/http'
 import type {
-  CloseMonthInput,
   CreateExpenseInput,
   DeleteExpenseInput,
   FortnightPeriod,
@@ -81,15 +80,6 @@ export const plannerServiceApi: PlannerService = {
         applyScope: {
           scope: input.applyScope,
         },
-      },
-    })
-  },
-
-  async closeMonth(input: CloseMonthInput) {
-    return apiRequest<MonthDetail>(`/planner/months/${input.monthPeriodId}/close`, {
-      method: 'PATCH',
-      body: {
-        confirmClose: input.confirmClose,
       },
     })
   },

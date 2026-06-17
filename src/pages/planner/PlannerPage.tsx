@@ -1,14 +1,12 @@
 import { useAuth } from '../../app/providers/useAuth';
 import { usePlanner } from '../../app/providers/usePlanner';
-import { CloseMonthCard } from '../../features/close-month/CloseMonthCard';
 import { FortnightIncomeCard } from '../../features/edit-fortnight-income/FortnightIncomeCard';
 import { RegisterExpenseForm } from '../../features/register-expense/RegisterExpenseForm';
-import { getDaysUntil } from '../../shared/lib/date';
 import { SignOutButton } from '../../features/sign-out/SignOutButton';
 import { ExpenseList } from '../../widgets/expense-list/ExpenseList';
+import { FortnightSummary } from '../../widgets/fortnight-summary/FortnightSummary';
 import { MonthlyCalendar } from '../../widgets/monthly-calendar/MonthlyCalendar';
 import { PeriodSelector } from '../../widgets/period-selector/PeriodSelector';
-import { FortnightSummary } from '../../widgets/fortnight-summary/FortnightSummary';
 import './PlannerPage.css';
 
 export function PlannerPage() {
@@ -16,13 +14,14 @@ export function PlannerPage() {
   const {
     error,
     isLoading,
-    selectedMonth,
     selectedFortnight,
     selectedFortnightExpenses,
+    selectedMonth,
   } = usePlanner();
-  const pendingExpenses = selectedFortnightExpenses.filter((expense) => expense.status === 'Pending');
-  const overdueExpenses = pendingExpenses.filter((expense) => getDaysUntil(expense.estimatedPaymentDate) < 0);
-  const heroTone = getHeroTone(selectedFortnightExpenses.length, pendingExpenses.length, overdueExpenses.length);
+  const pendingExpenses = selectedFortnightExpenses.filter(
+    (expense) => expense.status === 'Pending',
+  ).length;
+  const monthExpenseCount = selectedMonth?.expenses.length ?? 0;
 
   return (
     <main className='planner-shell'>
@@ -36,36 +35,37 @@ export function PlannerPage() {
       </section>
 
       <section className='planner-hero'>
-        <div>
-          <p className='planner-eyebrow'>Cuida tus finanzas</p>
-          <h1>Control de gastos por año, mes y quincena</h1>
+        <div className='planner-hero-copy'>
+          <p className='planner-eyebrow'>Planeador y controlador de finanzas</p>
+          <h1>
+            <em>Quien controla sus finanzas, controla su futuro.</em>
+          </h1>
           <p className='planner-lead'>
-            <em>Quien controla sus finanzas, controla su destino.</em>
+            Esta vista está pensada para decidir qué pagar ahora, qué se viene
+            después y cuánto aire real queda en la quincena actual.
           </p>
-        </div>
 
-        <div className={`planner-hero-card planner-hero-card-${heroTone}`}>
-          <span>
-            {selectedMonth?.status === 'Closed'
-              ? 'Modo readonly'
-              : 'Modo edicion'}
-          </span>
-          <strong>
-            {selectedMonth
-              ? `${selectedMonth.monthName} ${selectedMonth.year}`
-              : 'Sin período'}
-          </strong>
-          <p>
-            {selectedFortnightExpenses.length} gastos visibles en la quincena
-            seleccionada
-          </p>
-          <small>
-            {overdueExpenses.length > 0
-              ? `${overdueExpenses.length} vencidos`
-              : pendingExpenses.length > 0
-                ? `${pendingExpenses.length} pendientes por cubrir`
-                : 'Sin pendientes en esta quincena'}
-          </small>
+          <div
+            className='planner-hero-meta'
+            aria-label='Contexto del período activo'
+          >
+            <article>
+              <span>Mes activo</span>
+              <strong>
+                {selectedMonth
+                  ? `${selectedMonth.monthName} ${selectedMonth.year}`
+                  : 'Sin selección'}
+              </strong>
+            </article>
+            <article>
+              <span>Gastos del mes</span>
+              <strong>{monthExpenseCount}</strong>
+            </article>
+            <article>
+              <span>Pendientes</span>
+              <strong>{pendingExpenses}</strong>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -86,26 +86,9 @@ export function PlannerPage() {
         <aside className='planner-side-column'>
           <FortnightIncomeCard />
           <RegisterExpenseForm key={selectedFortnight?.id ?? 'empty'} />
-          <CloseMonthCard />
           <FortnightSummary />
         </aside>
       </div>
     </main>
   );
-}
-
-function getHeroTone(totalExpenses: number, pendingExpenses: number, overdueExpenses: number) {
-  if (totalExpenses === 0) {
-    return 'neutral';
-  }
-
-  if (overdueExpenses > 0) {
-    return 'danger';
-  }
-
-  if (pendingExpenses > 0) {
-    return 'warning';
-  }
-
-  return 'success';
 }

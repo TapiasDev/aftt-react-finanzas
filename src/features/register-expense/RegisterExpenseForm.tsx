@@ -27,7 +27,6 @@ export function RegisterExpenseForm() {
     return null
   }
 
-  const isClosed = selectedMonth.status === 'Closed'
   const selectedFortnightId = selectedFortnight.id
   const minDate = selectedFortnight.startDate
   const maxDate = selectedFortnight.endDate
@@ -64,9 +63,7 @@ export function RegisterExpenseForm() {
           <p className="planner-kicker">Registrar gasto</p>
           <h2>Nuevo gasto para la quincena actual</h2>
         </div>
-        <span className={`planner-badge${isClosed ? ' is-closed' : ''}`}>
-          {isClosed ? 'Readonly' : 'Editable'}
-        </span>
+        <span className="planner-badge">Editable</span>
       </div>
 
       <form className="planner-expense-form" onSubmit={handleSubmit}>
@@ -76,7 +73,7 @@ export function RegisterExpenseForm() {
             className="planner-input"
             value={form.name}
             onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-            disabled={isClosed || isSavingExpense}
+            disabled={isSavingExpense}
           />
         </label>
 
@@ -95,7 +92,7 @@ export function RegisterExpenseForm() {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, amount: event.target.value }))
                 }
-                disabled={isClosed || isSavingExpense}
+                disabled={isSavingExpense}
               />
               <span className="planner-money-suffix">COP</span>
             </div>
@@ -110,7 +107,7 @@ export function RegisterExpenseForm() {
               min={minDate}
               max={maxDate}
               onChange={(event) => handleDateChange(event.target.value)}
-              disabled={isClosed || isSavingExpense}
+              disabled={isSavingExpense}
             />
           </label>
         </div>
@@ -123,7 +120,7 @@ export function RegisterExpenseForm() {
             onChange={(event) =>
               setForm((current) => ({ ...current, description: event.target.value }))
             }
-            disabled={isClosed || isSavingExpense}
+            disabled={isSavingExpense}
           />
         </label>
 
@@ -138,7 +135,7 @@ export function RegisterExpenseForm() {
                 recurrenceMode: event.target.value as typeof current.recurrenceMode,
               }))
             }
-            disabled={isClosed || isSavingExpense}
+            disabled={isSavingExpense}
           >
             <option value="none">Solo esta quincena</option>
             <option value="monthly_twice">Ambas quincenas de este mes</option>
@@ -147,16 +144,14 @@ export function RegisterExpenseForm() {
           </select>
         </label>
 
-        <button className="planner-primary-button" type="submit" disabled={isClosed || isSavingExpense}>
+        <button className="planner-primary-button" type="submit" disabled={isSavingExpense}>
           {isSavingExpense ? 'Guardando...' : 'Crear gasto'}
         </button>
       </form>
 
       <p className="planner-inline-message">
         {message ??
-          (isClosed
-            ? 'No se pueden crear gastos mientras el mes este cerrado.'
-            : `La fecha debe estar entre ${minDate} y ${maxDate}.`) }
+          `La fecha debe estar entre ${minDate} y ${maxDate}.` }
       </p>
     </section>
   )

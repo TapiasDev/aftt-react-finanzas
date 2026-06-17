@@ -28,8 +28,11 @@ export function SignInForm() {
     <main className='auth-shell'>
       <section className='auth-card'>
         <div className='auth-header'>
-          <p className='auth-kicker'>Cuida tus finanzas</p>
-          <h1>Inicio de sesión</h1>
+          <p className='auth-kicker'>Pladeador y controlador de finanzas</p>
+          <h1>Ingresa y controla tus finanzas</h1>
+          <em>
+            Cuida de los pequeños gastos; un pequeño agujero hunde un barco.
+          </em>
         </div>
 
         <form className='auth-form' onSubmit={handleSubmit}>
@@ -53,7 +56,9 @@ export function SignInForm() {
                 className='auth-input-action'
                 type='button'
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                aria-label={
+                  showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'
+                }
               >
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
@@ -65,7 +70,7 @@ export function SignInForm() {
             type='submit'
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+            {isSubmitting ? 'Ingresando...' : 'Entrar'}
           </button>
         </form>
 

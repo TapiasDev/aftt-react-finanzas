@@ -30,8 +30,6 @@ id
 yearPeriodId
 monthNumber
 monthName
-status: Open | Closed
-closedAt
 createdAt
 updatedAt
 ```

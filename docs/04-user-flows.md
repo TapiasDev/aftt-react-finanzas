@@ -35,11 +35,9 @@
 4. Sistema actualiza total pagado.
 5. Sistema actualiza total pendiente.
 
-## Flow 005 - Cerrar mes
+## Flow 005 - Cambiar tema
 
-1. Usuario autenticado abre mes.
-2. Usuario revisa gastos.
-3. Usuario selecciona cerrar mes.
-4. Sistema pide confirmación.
-5. Usuario confirma.
-6. Sistema bloquea el mes.
+1. Usuario abre la aplicación.
+2. Usuario usa el toggle de tema.
+3. Sistema cambia entre modo dark y light.
+4. La preferencia queda persistida para próximas visitas.

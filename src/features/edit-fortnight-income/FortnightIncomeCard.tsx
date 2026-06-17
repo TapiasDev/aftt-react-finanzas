@@ -25,7 +25,6 @@ export function FortnightIncomeCard() {
     return null
   }
 
-  const isClosed = selectedMonth.status === 'Closed'
   const displayedAmount =
     draft.fortnightId === selectedFortnightId ? draft.amount : String(selectedFortnightIncome)
 
@@ -54,9 +53,7 @@ export function FortnightIncomeCard() {
           <p className="planner-kicker">Ingreso quincenal</p>
           <h3>{selectedFortnight.type === 'First' ? 'Primera quincena' : 'Segunda quincena'}</h3>
         </div>
-        <span className={`planner-badge${isClosed ? ' is-closed' : ''}`}>
-          {isClosed ? 'Mes cerrado' : 'Mes abierto'}
-        </span>
+        <span className="planner-badge">Editable</span>
       </div>
 
       <form className="planner-income-form" onSubmit={handleSubmit}>
@@ -77,13 +74,13 @@ export function FortnightIncomeCard() {
                   amount: event.target.value,
                 })
               }
-              disabled={isClosed || isSavingIncome}
+              disabled={isSavingIncome}
             />
             <span className="planner-money-suffix">COP</span>
           </div>
         </label>
 
-        <button className="planner-primary-button" type="submit" disabled={isClosed || isSavingIncome}>
+        <button className="planner-primary-button" type="submit" disabled={isSavingIncome}>
           {isSavingIncome ? 'Guardando...' : 'Guardar ingreso'}
         </button>
       </form>

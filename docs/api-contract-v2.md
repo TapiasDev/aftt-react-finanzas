@@ -47,8 +47,6 @@ id uuid pk
 year_period_id uuid not null fk year_periods(id)
 month_number integer not null
 month_name varchar not null
-status varchar not null check in (Open, Closed)
-closed_at timestamptz null
 created_at timestamptz not null
 updated_at timestamptz not null
 unique(year_period_id, month_number)
@@ -169,8 +167,6 @@ interface MonthSummaryDto {
   year: number
   monthNumber: number
   monthName: string
-  status: 'Open' | 'Closed'
-  closedAt: string | null
 }
 
 interface FortnightPeriodDto {
@@ -299,22 +295,6 @@ Response DTO:
 type UpdateExpenseResponseDto = MonthDetailDto
 ```
 
-### `PATCH /planner/months/:monthId/close`
-
-Request DTO:
-
-```ts
-interface CloseMonthRequestDto {
-  confirmClose: boolean
-}
-```
-
-Response DTO:
-
-```ts
-type CloseMonthResponseDto = MonthDetailDto
-```
-
 ## Validaciones backend mínimas
 
 ## Auth
@@ -335,7 +315,6 @@ type CloseMonthResponseDto = MonthDetailDto
 - `expense.amount > 0`.
 - `estimatedPaymentDate` dentro del mes.
 - `estimatedPaymentDate` dentro de la quincena.
-- no modificar meses cerrados.
 
 ## Servicios backend sugeridos
 
@@ -360,7 +339,6 @@ PlannerService
   - createExpense(userId, input)
   - updateExpense(userId, expenseId, input)
   - toggleExpenseStatus(userId, expenseId, isPaid)
-  - closeMonth(userId, monthId, confirmClose)
 ```
 
 ## Queries/guards de ownership recomendados
