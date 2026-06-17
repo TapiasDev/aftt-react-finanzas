@@ -4,7 +4,7 @@ import { validateInitialPasswordChange } from '../../shared/lib/validation'
 import '../sign-in/AuthScreens.css'
 
 export function ForcePasswordChangeForm() {
-  const { currentUser, changeInitialPassword, isSubmitting, error } = useAuth()
+  const { currentUser, changeInitialPassword, signOut, isSubmitting, error } = useAuth()
   const [username, setUsername] = useState(currentUser?.username ?? '')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -28,6 +28,17 @@ export function ForcePasswordChangeForm() {
     } catch (caughtError) {
       setMessage(
         caughtError instanceof Error ? caughtError.message : 'Unexpected password change error.',
+      )
+    }
+  }
+
+  async function handleSignOut() {
+    try {
+      await signOut()
+      setMessage(null)
+    } catch (caughtError) {
+      setMessage(
+        caughtError instanceof Error ? caughtError.message : 'Unexpected sign out error.',
       )
     }
   }
@@ -94,6 +105,15 @@ export function ForcePasswordChangeForm() {
 
           <button className="auth-primary-button" type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Actualizando...' : 'Guardar nueva contrasena'}
+          </button>
+
+          <button
+            className="auth-secondary-button"
+            type="button"
+            onClick={() => void handleSignOut()}
+            disabled={isSubmitting}
+          >
+            Cerrar sesión
           </button>
         </form>
 

@@ -9,7 +9,17 @@ export function AuthGuard() {
   const { currentUser, isLoading } = useAuth()
 
   if (isLoading) {
-    return <main className="auth-shell">Cargando sesion...</main>
+    return (
+      <main className="auth-shell">
+        <section className="auth-card">
+          <div className="auth-header">
+            <p className="auth-kicker">Planner quincenal</p>
+            <h1>Preparando tu espacio de trabajo.</h1>
+            <p>Cargando sesión...</p>
+          </div>
+        </section>
+      </main>
+    )
   }
 
   if (!currentUser) {

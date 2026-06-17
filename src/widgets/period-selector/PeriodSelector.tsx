@@ -13,11 +13,7 @@ export function PeriodSelector() {
           <p className="planner-kicker">Período</p>
           <h2>Selecciona el contexto de trabajo</h2>
         </div>
-        {selectedMonth ? (
-          <span className={`planner-badge${selectedMonth.status === 'Closed' ? ' is-closed' : ''}`}>
-            {selectedMonth.status === 'Closed' ? 'Readonly' : 'Editable'}
-          </span>
-        ) : null}
+        {selectedMonth ? <span className="planner-badge">Activo</span> : null}
       </div>
 
       <div className="planner-selector-grid">

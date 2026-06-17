@@ -22,7 +22,6 @@ export interface PlannerContextValue {
   isSavingIncome: boolean
   isSavingExpense: boolean
   isTogglingExpense: boolean
-  isClosingMonth: boolean
   error: string | null
   selectYear: (year: number) => Promise<void>
   selectMonth: (monthNumber: number) => Promise<void>
@@ -46,7 +45,6 @@ export interface PlannerContextValue {
     applyScope: 'current' | 'future_only' | 'current_and_future'
   }) => Promise<void>
   deleteExpense: (input: DeleteExpenseInput) => Promise<void>
-  closeMonth: (monthPeriodId: string, confirmClose: boolean) => Promise<void>
 }
 
 export const PlannerContext = createContext<PlannerContextValue | null>(null)

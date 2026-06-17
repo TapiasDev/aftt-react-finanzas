@@ -1,4 +1,3 @@
-export type MonthStatus = 'Open' | 'Closed'
 export type ExpenseStatus = 'Pending' | 'Paid'
 export type FortnightType = 'First' | 'Second'
 export type ExpenseRecurrenceMode = 'none' | 'monthly_twice' | 'future_once' | 'future_twice'
@@ -9,8 +8,6 @@ export interface MonthSummary {
   year: number
   monthNumber: number
   monthName: string
-  status: MonthStatus
-  closedAt: string | null
 }
 
 export interface FortnightPeriod {
@@ -91,12 +88,6 @@ export interface DeleteExpenseInput {
   expenseId: string
   applyScope: ExpenseApplyScope
 }
-
-export interface CloseMonthInput {
-  monthPeriodId: string
-  confirmClose: boolean
-}
-
 export interface CalendarCell {
   date: string
   dayNumber: number

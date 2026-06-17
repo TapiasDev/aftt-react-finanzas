@@ -1,11 +1,16 @@
 import { AuthProvider } from './app/providers/AuthProvider'
+import { ThemeProvider } from './app/providers/ThemeProvider'
+import { ThemeToggle } from './widgets/theme-toggle/ThemeToggle'
 import { AuthGuard } from './widgets/auth-guard/AuthGuard'
 
 function App() {
   return (
-    <AuthProvider>
-      <AuthGuard />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ThemeToggle />
+        <AuthGuard />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

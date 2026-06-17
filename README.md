@@ -18,7 +18,7 @@ Permitir que un usuario final pueda:
 - Ingresar el ingreso quincenal.
 - Marcar gastos como pagados.
 - Visualizar cuánto debe pagar, cuánto ha pagado, cuánto le falta y cuánto le queda.
-- Cerrar un mes para bloquear cambios.
+- Cambiar entre modo dark y light.
 - Visualizar la información en formato calendario real.
 
 ## Reglas de usuarios
@@ -65,4 +65,4 @@ tasks/
 8. Usuario registra gastos y puede decidir si son unicos o recurrentes.
 9. Sistema calcula resumen financiero.
 10. Usuario marca gastos como pagados.
-11. Usuario cierra el mes cuando finaliza.
+11. Usuario puede trabajar el planner en modo dark o light.

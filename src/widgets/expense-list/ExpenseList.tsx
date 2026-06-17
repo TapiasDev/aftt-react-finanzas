@@ -65,7 +65,6 @@ export function ExpenseList() {
     return null
   }
 
-  const isClosed = selectedMonth.status === 'Closed'
   const minDate = selectedFortnight?.startDate ?? ''
   const maxDate = selectedFortnight?.endDate ?? ''
   const filteredExpenses = selectedFortnightExpenses.filter((expense) => matchesFilter(expense, selectedFilter))
@@ -238,9 +237,7 @@ export function ExpenseList() {
           <p className="planner-kicker">Gastos</p>
           <h2>Listado de la quincena seleccionada</h2>
         </div>
-        <span className={`planner-badge${isClosed ? ' is-closed' : ''}`}>
-          {isClosed ? 'Readonly' : 'Edicion activa'}
-        </span>
+        <span className="planner-badge">Edición activa</span>
       </div>
 
       <div className="planner-expense-list">
@@ -349,7 +346,7 @@ export function ExpenseList() {
                     type="checkbox"
                     checked={isPaid}
                     onChange={(event) => void handleToggle(expense.id, event.target.checked)}
-                    disabled={isClosed || isTogglingExpense || isEditing}
+                    disabled={isTogglingExpense || isEditing}
                   />
                   <span>{isPaid ? 'Pagado' : 'Pendiente'}</span>
                 </label>
@@ -378,7 +375,7 @@ export function ExpenseList() {
                     type="button"
                     className="planner-icon-button"
                     onClick={() => startEditing(expense)}
-                    disabled={isClosed}
+                    disabled={false}
                     aria-label="Editar gasto"
                     title="Editar gasto"
                   >
@@ -390,7 +387,7 @@ export function ExpenseList() {
                   type="button"
                   className="planner-icon-button"
                   onClick={() => openDuplicateDialog(expense)}
-                  disabled={isClosed || isSavingExpense}
+                  disabled={isSavingExpense}
                   aria-label="Duplicar gasto"
                   title="Duplicar gasto"
                 >
@@ -401,7 +398,7 @@ export function ExpenseList() {
                   type="button"
                   className="planner-icon-button planner-icon-button-danger"
                   onClick={() => openDeleteDialog(expense)}
-                  disabled={isClosed || isSavingExpense}
+                  disabled={isSavingExpense}
                   aria-label="Eliminar gasto"
                   title="Eliminar gasto"
                 >
@@ -415,9 +412,7 @@ export function ExpenseList() {
 
       <p className="planner-inline-message">
         {message ??
-          (isClosed
-            ? 'El mes esta en readonly: editar y cambiar estados esta deshabilitado.'
-            : `Puedes editar el gasto dentro del rango ${minDate} a ${maxDate}.`) }
+          `Puedes editar el gasto dentro del rango ${minDate} a ${maxDate}.` }
       </p>
 
       {deleteDialog ? (

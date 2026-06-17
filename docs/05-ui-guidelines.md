@@ -22,7 +22,7 @@ La vista principal debe contener:
 - Resumen financiero.
 - Lista de gastos.
 - Botón para agregar gasto.
-- Botón para cerrar mes.
+- Toggle para cambiar entre modo dark y light.
 
 ## Calendario
 
@@ -31,7 +31,7 @@ El calendario debe:
 - Mostrar días reales del mes.
 - Mostrar gastos en su fecha correspondiente.
 - Diferenciar gastos pagados y pendientes.
-- Indicar si el mes está cerrado.
+- Ofrecer una versión tipo agenda en mobile.
 
 ## Resumen financiero
 

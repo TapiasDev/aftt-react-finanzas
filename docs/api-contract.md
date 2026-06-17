@@ -62,9 +62,7 @@ Codigos sugeridos:
   "id": "month-2026-6",
   "year": 2026,
   "monthNumber": 6,
-  "monthName": "June",
-  "status": "Open",
-  "closedAt": null
+  "monthName": "June"
 }
 ```
 
@@ -104,8 +102,6 @@ Codigos sugeridos:
   "year": 2026,
   "monthNumber": 6,
   "monthName": "June",
-  "status": "Open",
-  "closedAt": null,
   "fortnights": [],
   "expenses": []
 }
@@ -269,9 +265,7 @@ Respuestas:
       "id": "month-2026-1",
       "year": 2026,
       "monthNumber": 1,
-      "monthName": "January",
-      "status": "Open",
-      "closedAt": null
+      "monthName": "January"
     }
   ]
 }
@@ -296,8 +290,6 @@ Respuestas:
   "year": 2026,
   "monthNumber": 6,
   "monthName": "June",
-  "status": "Open",
-  "closedAt": null,
   "fortnights": [
     {
       "id": "month-2026-6-first",
@@ -344,14 +336,6 @@ Respuestas:
 }
 ```
 
-- `409 Conflict`
-
-```json
-{
-  "message": "Income cannot be updated for a closed month."
-}
-```
-
 ### POST `/planner/expenses`
 
 Request:
@@ -375,8 +359,6 @@ Respuestas:
   "year": 2026,
   "monthNumber": 6,
   "monthName": "June",
-  "status": "Open",
-  "closedAt": null,
   "fortnights": [],
   "expenses": []
 }
@@ -409,8 +391,6 @@ Respuestas:
   "year": 2026,
   "monthNumber": 6,
   "monthName": "June",
-  "status": "Open",
-  "closedAt": null,
   "fortnights": [],
   "expenses": []
 }
@@ -438,52 +418,8 @@ Respuestas:
   "year": 2026,
   "monthNumber": 6,
   "monthName": "June",
-  "status": "Open",
-  "closedAt": null,
   "fortnights": [],
   "expenses": []
-}
-```
-
-- `409 Conflict`
-
-```json
-{
-  "message": "Expense cannot be updated for a closed month."
-}
-```
-
-### PATCH `/planner/months/:monthId/close`
-
-Request:
-
-```json
-{
-  "confirmClose": true
-}
-```
-
-Respuestas:
-- `200 OK`
-
-```json
-{
-  "id": "month-2026-6",
-  "year": 2026,
-  "monthNumber": 6,
-  "monthName": "June",
-  "status": "Closed",
-  "closedAt": "2026-06-30T23:59:59Z",
-  "fortnights": [],
-  "expenses": []
-}
-```
-
-- `400 Bad Request`
-
-```json
-{
-  "message": "Closing a month requires confirmation."
 }
 ```
 

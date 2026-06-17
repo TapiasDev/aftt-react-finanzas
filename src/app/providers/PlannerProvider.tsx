@@ -7,7 +7,6 @@ import {
 import { calculateFinancialSummary } from '../../entities/financial-summary/model/calculateFinancialSummary'
 import { validateIncomeAmount } from '../../shared/lib/validation'
 import type {
-  CloseMonthInput,
   CreateExpenseInput,
   DeleteExpenseInput,
   FinancialSummary,
@@ -41,7 +40,6 @@ export function PlannerProvider({ children }: PropsWithChildren) {
   const [isSavingIncome, setIsSavingIncome] = useState(false)
   const [isSavingExpense, setIsSavingExpense] = useState(false)
   const [isTogglingExpense, setIsTogglingExpense] = useState(false)
-  const [isClosingMonth, setIsClosingMonth] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -139,8 +137,6 @@ export function PlannerProvider({ children }: PropsWithChildren) {
               year: updatedMonth.year,
               monthNumber: updatedMonth.monthNumber,
               monthName: updatedMonth.monthName,
-              status: updatedMonth.status,
-              closedAt: updatedMonth.closedAt,
             }
           : month,
       ),
@@ -281,24 +277,6 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     }
   }
 
-  async function closeMonth(monthPeriodId: string, confirmClose: boolean) {
-    const input: CloseMonthInput = { monthPeriodId, confirmClose }
-
-    try {
-      setIsClosingMonth(true)
-      setError(null)
-
-      const updatedMonth = await plannerService.closeMonth(input)
-      applyUpdatedMonth(updatedMonth)
-    } catch (caughtError) {
-      const message = getErrorMessage(caughtError)
-      setError(message)
-      throw new Error(message, { cause: caughtError })
-    } finally {
-      setIsClosingMonth(false)
-    }
-  }
-
   const value = {
     availableYears,
     selectedYear,
@@ -312,7 +290,6 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     isSavingIncome,
     isSavingExpense,
     isTogglingExpense,
-    isClosingMonth,
     error,
     selectYear,
     selectMonth,
@@ -322,7 +299,6 @@ export function PlannerProvider({ children }: PropsWithChildren) {
     toggleExpenseStatus,
     updateExpense,
     deleteExpense,
-    closeMonth,
   } satisfies PlannerContextValue
 
   return <PlannerContext value={value}>{children}</PlannerContext>
