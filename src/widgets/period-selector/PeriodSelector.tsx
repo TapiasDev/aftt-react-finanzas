@@ -11,7 +11,7 @@ export function PeriodSelector() {
       <div className="planner-panel-header">
         <div>
           <p className="planner-kicker">Período</p>
-          <h2>Selecciona el contexto de trabajo</h2>
+          <h2>Tu período de planificación</h2>
         </div>
         {selectedMonth ? <span className="planner-badge">Activo</span> : null}
       </div>
