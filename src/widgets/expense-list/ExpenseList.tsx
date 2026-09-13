@@ -3,6 +3,7 @@ import { usePlanner } from '../../app/providers/usePlanner'
 import { getDayNumberFromIso, getDaysUntil } from '../../shared/lib/date'
 import { formatMoney } from '../../shared/lib/format'
 import type { Expense, ExpenseApplyScope } from '../../shared/types/planner'
+import { MoneyInput } from '../../shared/ui/MoneyInput'
 
 type ExpenseFilter = 'all' | 'pending' | 'paid' | 'overdue'
 
@@ -241,7 +242,7 @@ export function ExpenseList() {
       </div>
 
       <div className="planner-expense-list">
-        <div className="planner-filter-group" role="tablist" aria-label="Filtros de gastos">
+        <div className="planner-filter-group" role="group" aria-label="Filtros de gastos">
           {[
             ['all', 'Todos'],
             ['pending', 'Pendientes'],
@@ -252,6 +253,7 @@ export function ExpenseList() {
               key={value}
               type="button"
               className={`planner-filter-chip${selectedFilter === value ? ' is-active' : ''}`}
+              aria-pressed={selectedFilter === value}
               onClick={() => setSelectedFilter(value as ExpenseFilter)}
             >
               {label}
@@ -260,7 +262,11 @@ export function ExpenseList() {
         </div>
 
         {filteredExpenses.length === 0 ? (
-          <p className="planner-empty-copy">No hay gastos registrados en esta quincena.</p>
+          <p className="planner-empty-copy">
+            {selectedFortnightExpenses.length === 0
+              ? 'Aún no tienes gastos en esta quincena. Usa “Nuevo gasto” para registrar el primero.'
+              : 'No hay gastos que coincidan con este filtro.'}
+          </p>
         ) : null}
 
         {filteredExpenses.map((expense) => {
@@ -283,22 +289,14 @@ export function ExpenseList() {
                       }
                       disabled={isSavingExpense}
                     />
-                    <div className="planner-money-input">
-                      <span className="planner-money-prefix">$</span>
-                      <input
-                        className="planner-input planner-input-money"
-                        type="number"
-                        min="0"
-                        step="1000"
-                        inputMode="numeric"
-                        value={editForm.amount}
-                        onChange={(event) =>
-                          setEditForm((current) => ({ ...current, amount: event.target.value }))
-                        }
-                        disabled={isSavingExpense}
-                      />
-                      <span className="planner-money-suffix">COP</span>
-                    </div>
+                    <MoneyInput
+                      label="Valor del gasto en COP"
+                      value={editForm.amount}
+                      onValueChange={(amount) =>
+                        setEditForm((current) => ({ ...current, amount }))
+                      }
+                      disabled={isSavingExpense}
+                    />
                     <input
                       className="planner-input"
                       type="date"

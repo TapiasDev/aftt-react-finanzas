@@ -4,22 +4,13 @@ import { ForcePasswordChangeForm } from '../../features/force-password-change/Fo
 import '../../features/sign-in/AuthScreens.css'
 import { SignInForm } from '../../features/sign-in/SignInForm'
 import { PlannerPage } from '../../pages/planner/PlannerPage'
+import { FullScreenLoading } from '../../shared/ui/FullScreenLoading'
 
 export function AuthGuard() {
   const { currentUser, isLoading } = useAuth()
 
   if (isLoading) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card">
-          <div className="auth-header">
-            <p className="auth-kicker">Planner quincenal</p>
-            <h1>Preparando tu espacio de trabajo.</h1>
-            <p>Cargando sesión...</p>
-          </div>
-        </section>
-      </main>
-    )
+    return <FullScreenLoading />
   }
 
   if (!currentUser) {

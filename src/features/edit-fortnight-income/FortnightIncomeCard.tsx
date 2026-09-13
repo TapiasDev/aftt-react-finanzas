@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
 import { formatMoney } from '../../shared/lib/format'
+import { MoneyInput } from '../../shared/ui/MoneyInput'
 
-export function FortnightIncomeCard() {
+export function FortnightIncomeCard({ onSuccess }: { onSuccess?: () => void }) {
   const { selectedFortnight, selectedMonth, saveFortnightIncome, isSavingIncome } = usePlanner()
   const [draft, setDraft] = useState({
     fortnightId: selectedFortnight?.id ?? 'empty',
@@ -41,6 +42,7 @@ export function FortnightIncomeCard() {
         amount: String(nextAmount),
       })
       setMessage(`Ingreso guardado: ${formatMoney(nextAmount)}`)
+      onSuccess?.()
     } catch (caughtError) {
       setMessage(caughtError instanceof Error ? caughtError.message : 'Unexpected save error.')
     }
@@ -59,25 +61,16 @@ export function FortnightIncomeCard() {
       <form className="planner-income-form" onSubmit={handleSubmit}>
         <label className="planner-field">
           <span className="planner-label">Valor</span>
-          <div className="planner-money-input">
-            <span className="planner-money-prefix">$</span>
-            <input
-              className="planner-input planner-input-money"
-              type="number"
-              min="0"
-              step="1000"
-              inputMode="numeric"
-              value={displayedAmount}
-              onChange={(event) =>
-                setDraft({
-                  fortnightId: selectedFortnightId,
-                  amount: event.target.value,
-                })
-              }
-              disabled={isSavingIncome}
-            />
-            <span className="planner-money-suffix">COP</span>
-          </div>
+          <MoneyInput
+            value={displayedAmount}
+            onValueChange={(amount) =>
+              setDraft({
+                fortnightId: selectedFortnightId,
+                amount,
+              })
+            }
+            disabled={isSavingIncome}
+          />
         </label>
 
         <button className="planner-primary-button" type="submit" disabled={isSavingIncome}>

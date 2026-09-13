@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { usePlanner } from '../../app/providers/usePlanner'
 import type { ExpenseRecurrenceMode } from '../../shared/types/planner'
+import { MoneyInput } from '../../shared/ui/MoneyInput'
 
 interface RegisterExpenseFormState {
   name: string
@@ -18,7 +19,7 @@ const emptyForm: RegisterExpenseFormState = {
   recurrenceMode: 'none',
 }
 
-export function RegisterExpenseForm() {
+export function RegisterExpenseForm({ onSuccess }: { onSuccess?: () => void }) {
   const { selectedMonth, selectedFortnight, createExpense, isSavingExpense } = usePlanner()
   const [form, setForm] = useState(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
@@ -51,6 +52,7 @@ export function RegisterExpenseForm() {
 
       setForm(emptyForm)
       setMessage('Gasto creado como pendiente.')
+      onSuccess?.()
     } catch (caughtError) {
       setMessage(caughtError instanceof Error ? caughtError.message : 'Unexpected expense error.')
     }
@@ -61,9 +63,8 @@ export function RegisterExpenseForm() {
       <div className="planner-panel-header">
         <div>
           <p className="planner-kicker">Registrar gasto</p>
-          <h2>Nuevo gasto para la quincena actual</h2>
+          <h2>Registrar un nuevo gasto</h2>
         </div>
-        <span className="planner-badge">Editable</span>
       </div>
 
       <form className="planner-expense-form" onSubmit={handleSubmit}>
@@ -80,22 +81,13 @@ export function RegisterExpenseForm() {
         <div className="planner-form-split">
           <label className="planner-field">
             <span className="planner-label">Valor</span>
-            <div className="planner-money-input">
-              <span className="planner-money-prefix">$</span>
-              <input
-                className="planner-input planner-input-money"
-                type="number"
-                min="0"
-                step="1000"
-                inputMode="numeric"
-                value={form.amount}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, amount: event.target.value }))
-                }
-                disabled={isSavingExpense}
-              />
-              <span className="planner-money-suffix">COP</span>
-            </div>
+            <MoneyInput
+              value={form.amount}
+              onValueChange={(amount) =>
+                setForm((current) => ({ ...current, amount }))
+              }
+              disabled={isSavingExpense}
+            />
           </label>
 
           <label className="planner-field">
@@ -149,7 +141,7 @@ export function RegisterExpenseForm() {
         </button>
       </form>
 
-      <p className="planner-inline-message">
+      <p className="planner-inline-message" role="status">
         {message ??
           `La fecha debe estar entre ${minDate} y ${maxDate}.` }
       </p>
